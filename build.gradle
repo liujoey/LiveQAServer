@@ -1,0 +1,29 @@
+version = '1.0'
+repositories {
+    mavenCentral()
+}
+task compile(type: JavaCompile)
+
+apply plugin: 'java'
+apply plugin: 'application'
+mainClassName = "org.trec.liveqa.TrecLiveQaDemoServer"
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+        resources {
+            srcDir 'data'
+        }
+    }
+}
+
+dependencies {
+    compile "commons-httpclient:commons-httpclient:3.1"
+    compile "org.jsoup:jsoup:1.8.3"
+}
+
+run {
+    standardInput = System.in
+}
