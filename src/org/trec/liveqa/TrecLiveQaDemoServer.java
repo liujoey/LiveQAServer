@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -62,7 +62,7 @@ public class TrecLiveQaDemoServer extends NanoHTTPD {
     public static final TimeZone WORKING_TIME_ZONE = TimeZone.getTimeZone(WORKING_TIME_ZONE_ID);
     public static final Charset WORKING_CHARSET = StandardCharsets.UTF_8;
 
-    private static final Logger logger = Logger.getLogger(TrecLiveQaDemoServer.class.getName());
+    private static final Logger logger = Logger.getLogger(TrecLiveQaDemoServer.class);
 
     public TrecLiveQaDemoServer(String hostname, int port) {
         super(hostname, port);
@@ -97,13 +97,16 @@ public class TrecLiveQaDemoServer extends NanoHTTPD {
         String body = params.get(QUESTION_BODY_PARAMETER_NAME);
         String category = params.get(QUESTION_CATEGORY_PARAMETER_NAME);
         logger.info("QID: " + qid);
+        logger.info("Title: " + title);
+        logger.info("Body: " + body);
+        logger.info("Category: " + category);
 
         // "get answer"
         AnswerAndResourcesAndSummaries answerAndResources = null;
         try {
             answerAndResources = getAnswerAndResourcesAndSummaries(qid, title, body, category);
         } catch (Exception e) {
-            logger.warning("Failed to retrieve answer and resources");
+            logger.warn("Failed to retrieve answer and resources");
             e.printStackTrace();
             return null;
         }
@@ -114,7 +117,7 @@ public class TrecLiveQaDemoServer extends NanoHTTPD {
         try {
             docBuilder = docFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
-            logger.warning("Could not build XML document");
+            logger.warn("Could not build XML document");
             e.printStackTrace();
             return null;
         }
