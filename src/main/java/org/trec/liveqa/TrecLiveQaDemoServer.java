@@ -54,7 +54,7 @@ public class TrecLiveQaDemoServer extends NanoHTTPD {
     public static final String YES = "yes";
     public static final String NO = "no";
 
-    public static final String EXCUSE = "I just couldn't cut it :(";
+    protected static String EXCUSE = "I just couldn't cut it :(";
 
     public static final int DEFAULT_PORT = 11000;
     public static final Locale WORKING_LOCALE = Locale.US;
