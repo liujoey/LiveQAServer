@@ -23,6 +23,7 @@ public class RealServer extends TrecLiveQaDemoServer {
         public String category;
         public String answer;
         public String resources;
+        public String focus;
 
         public Question(String qid, String title, String body, String category) {
             this.qid = qid;
@@ -31,6 +32,7 @@ public class RealServer extends TrecLiveQaDemoServer {
             this.category = category;
             answer = null;
             resources = null;
+            focus = null;
         }
 
         @Override
@@ -53,10 +55,12 @@ public class RealServer extends TrecLiveQaDemoServer {
         questions.remove(qid);
     }
 
-    public synchronized void setAnswer(String qid, String answer, String resources) {
+    public synchronized void setAnswer(String qid, String answer, String resources, String focus) {
         if (questions.containsKey(qid)) {
-            questions.get(qid).answer = answer;
-            questions.get(qid).resources = resources;
+            Question question = questions.get(qid);
+            question.answer = answer;
+            question.resources = resources;
+            question.focus = focus;
         }
     }
 
@@ -70,6 +74,13 @@ public class RealServer extends TrecLiveQaDemoServer {
     public String getResources(String qid) {
         if (questions.containsKey(qid)) {
             return questions.get(qid).resources;
+        }
+        return null;
+    }
+
+    public String getFocus(String qid) {
+        if (questions.containsKey(qid)) {
+            return questions.get(qid).focus;
         }
         return null;
     }
@@ -92,11 +103,12 @@ public class RealServer extends TrecLiveQaDemoServer {
                         try {
                             logger.info(message);
                             String[] answer = message.split("\t");
-                            assert answer.length == 3 : message + " is not a correct answer format!";
+                            assert answer.length == 4 : message + " is not a correct answer format!";
                             String qid = answer[0];
                             String answer_text = answer[1];
                             String resources = answer[2];
-                            setAnswer(qid, answer_text, resources);
+                            String focus = answer[3];
+                            setAnswer(qid, answer_text, resources, focus);
                             logger.info("Answer returned: " + message);
                         } catch (IndexOutOfBoundsException e) {
                             logger.error("Unexpected answer format!");
@@ -132,18 +144,19 @@ public class RealServer extends TrecLiveQaDemoServer {
         addQuestion(question);
         cc.send(question.toString());
         int count = 0;
-        while (getAnswer(qid) == null && count < 60) {
+        while (getAnswer(qid) == null && count < 59) {
             count ++;
             Thread.sleep(1000);
         }
         String answer = getAnswer(qid);
         String resources = getResources(qid);
+        String focus = getFocus(qid);
         removeQuestion(qid);
         if (answer == null) {
             EXCUSE = "ICON engine timeout!";
             return null;
         }
-        return new AnswerAndResourcesAndSummaries(answer, resources, "", "", "");
+        return new AnswerAndResourcesAndSummaries(answer, resources, focus, "", "");
     }
 
     public static void main(String[] args) throws IOException {
@@ -153,5 +166,4 @@ public class RealServer extends TrecLiveQaDemoServer {
         System.in.read();
         server.stop();
     }
-
 }
